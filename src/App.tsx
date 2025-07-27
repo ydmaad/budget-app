@@ -2,9 +2,8 @@ import { useEffect, useState } from "react";
 import "./App.css";
 import type { Transaction } from "./types";
 import TransactionSummary from "./components/TransactionSummary";
-import TransactionItem from "./components/TransactionItem";
 import TransactionForm from "./components/TransactionForm";
-import EditTransactionForm from "./components/EditTransactionForm";
+import TransactionList from "./components/TransactionList";
 
 function App() {
   // 모든 거래내역
@@ -13,13 +12,6 @@ function App() {
   const [isEditing, setIsEditing] = useState<boolean>(false);
   // 수정 중인 거래의 ID를 저장
   const [editingId, setEditingId] = useState<string | null>(null);
-  // 수정 폼 입력 데이터
-  const [editFormData, setEditFormData] = useState({
-    amount: "",
-    date: "",
-    category: "",
-    type: "expense" as "income" | "expense",
-  });
 
   // 거래 내역 추가, 수정, 삭제시 localStorage에 저장
   useEffect(() => {
@@ -51,12 +43,6 @@ function App() {
   const handleEdit = (transaction: Transaction) => {
     setIsEditing(true);
     setEditingId(transaction.id);
-    setEditFormData({
-      amount: transaction.amount.toString(),
-      date: transaction.date,
-      category: transaction.category,
-      type: transaction.type,
-    });
   };
 
   // 수정 완료 함수
@@ -109,33 +95,14 @@ function App() {
       />
 
       {/* 거래 내역 리스트 */}
-      <div className="mt-8 space-y-4 max-w-lg mx-auto">
-        {transactions
-          .sort((a, b) => {
-            if (new Date(a.date) > new Date(b.date)) return -1;
-            if (new Date(a.date) < new Date(b.date)) return 1;
-            return 0;
-          })
-          .map((transaction) => (
-            <div key={transaction.id}>
-              {editingId === transaction.id ? (
-                // 거래내역 수정 폼
-                <EditTransactionForm
-                  transaction={transaction}
-                  onUpdate={handleUpdate}
-                  onCancel={handleCancel}
-                />
-              ) : (
-                // 거래 내역 리스트
-                <TransactionItem
-                  transaction={transaction}
-                  onEdit={handleEdit}
-                  onDelete={handleDelete}
-                />
-              )}
-            </div>
-          ))}
-      </div>
+      <TransactionList
+        transactions={transactions}
+        editingId={editingId}
+        onEdit={handleEdit}
+        onCancel={handleCancel}
+        onDelete={handleDelete}
+        onUpdate={handleUpdate}
+      />
     </div>
   );
 }
