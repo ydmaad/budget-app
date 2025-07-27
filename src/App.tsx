@@ -1,19 +1,13 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
 import type { Transaction } from "./types";
 import TransactionSummary from "./components/TransactionSummary";
 import TransactionItem from "./components/TransactionItem";
+import TransactionForm from "./components/TransactionForm";
 
 function App() {
   // 모든 거래내역
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  // 폼 입력 데이터
-  const [formData, setFormData] = useState({
-    amount: "",
-    date: "",
-    category: "",
-    type: "expense" as "income" | "expense",
-  });
   // 수정 모드
   const [isEditing, setIsEditing] = useState<boolean>(false);
   // 수정 중인 거래의 ID를 저장
@@ -46,32 +40,6 @@ function App() {
     setTransactions([...transactions, newTransaction]);
   };
   // console.log(transactions);
-
-  // 거래 내역 폼 제출 처리 함수
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault();
-
-    if (!formData.amount || Number(formData.amount) <= 0)
-      return alert("금액을 입력해주세요!!");
-    if (!formData.date) return alert("날짜를 입력해주세요!!");
-    if (!formData.category) return alert("카테고리를 입력해주세요!!");
-
-    const newTransaction = {
-      id: Date.now().toString(),
-      amount: Number(formData.amount),
-      date: formData.date,
-      category: formData.category,
-      type: formData.type,
-    };
-
-    addTransaction(newTransaction);
-    setFormData({
-      amount: "",
-      date: "",
-      category: "",
-      type: "expense",
-    });
-  };
 
   // 거래 삭제 함수
   const handleDelete = (id: string) => {
@@ -147,58 +115,7 @@ function App() {
       </h1>
 
       {/* 거래 내역 추가 폼 */}
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white p-4 rounded max-w-lg mx-auto shadow-md space-y-2"
-      >
-        <div className="flex flex-col gap-2 sm:flex-row">
-          <input
-            type="number"
-            value={formData.amount}
-            onChange={(e) =>
-              setFormData({ ...formData, amount: e.target.value })
-            }
-            placeholder="금액"
-            className="border border-[#EAC8A6] rounded px-3 py-2 w-full"
-          />
-          <input
-            type="date"
-            value={formData.date}
-            onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-            className="border border-[#EAC8A6] rounded px-3 py-2 w-full"
-          />
-        </div>
-        <div className="flex flex-col gap-2 sm:flex-row">
-          <input
-            type="text"
-            value={formData.category}
-            onChange={(e) =>
-              setFormData({ ...formData, category: e.target.value })
-            }
-            placeholder="카테고리"
-            className="border border-[#EAC8A6] rounded px-3 py-2 w-full"
-          />
-          <select
-            value={formData.type}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                type: e.target.value as "income" | "expense",
-              })
-            }
-            className="border border-[#EAC8A6] rounded px-3 py-2 w-full"
-          >
-            <option value="income">수익</option>
-            <option value="expense">지출</option>
-          </select>
-        </div>
-        <button
-          type="submit"
-          className="bg-[#3D74B6] text-white px-4 py-2 rounded hover:opacity-90 transition"
-        >
-          추가
-        </button>
-      </form>
+      <TransactionForm onAddTransaction={addTransaction} />
 
       {/* 총 잔액 */}
       <TransactionSummary
