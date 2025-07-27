@@ -30,9 +30,14 @@ function App() {
   };
   // console.log(transactions);
 
-  // 폼 제출 처리 함수
+  // 거래 내역 폼 제출 처리 함수
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
+
+    if (!formData.amount || Number(formData.amount) <= 0)
+      return alert("금액을 입력해주세요!!");
+    if (!formData.date) return alert("날짜를 입력해주세요!!");
+    if (!formData.category) return alert("카테고리를 입력해주세요!!");
 
     const newTransaction = {
       id: Date.now().toString(),
@@ -70,6 +75,11 @@ function App() {
 
   // 수정 완료 함수
   const handleUpdate = () => {
+    if (!editFormData.amount || Number(editFormData.amount) <= 0)
+      return alert("금액을 입력해주세요!!");
+    if (!editFormData.date) return alert("날짜를 입력해주세요!!");
+    if (!editFormData.category) return alert("카테고리를 입력해주세요!!");
+
     const updateTransaction = transactions.map((transaction) => {
       if (transaction.id === editingId) {
         return {
@@ -101,12 +111,25 @@ function App() {
     setEditingId(null);
   };
 
+  // 총 수입
+  const totalIncome = transactions
+    .filter((transaction) => transaction.type === "income")
+    .reduce((total, transaction) => total + transaction.amount, 0);
+
+  // 총 지출
+  const totalExpense = transactions
+    .filter((transaction) => transaction.type === "expense")
+    .reduce((total, transaction) => total + transaction.amount, 0);
+
+  const balance = totalIncome - totalExpense;
+
   return (
     <div className="min-h-screen p-6">
       <h1 className="text-center text-[#3D74B6] text-4xl my-5">
         My Budget Tracker
       </h1>
 
+      {/* 거래 내열 추가 폼 */}
       <form
         onSubmit={handleSubmit}
         className="bg-white p-4 rounded max-w-lg mx-auto shadow-md space-y-2"
@@ -160,56 +183,101 @@ function App() {
         </button>
       </form>
 
+      {/* 총 잔액 */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-lg mx-auto mt-6 text-center">
+        <div className="bg-[#EAF1FB] p-4 rounded shadow">
+          <p className="text-sm text-gray-500">총 수입</p>
+          <p className="text-xl font-bold text-[#3D74B6]">
+            {totalIncome.toLocaleString()}원
+          </p>
+        </div>
+        <div className="bg-[#FDEDEC] p-4 rounded shadow">
+          <p className="text-sm text-gray-500">총 지출</p>
+          <p className="text-xl font-bold text-[#DC3C22]">
+            {totalExpense.toLocaleString()}원
+          </p>
+        </div>
+        <div className="bg-[#F7F7F7] p-4 rounded shadow">
+          <p className="text-sm text-gray-500">잔액</p>
+          <p className="text-xl font-bold text-[#3D74B6]">
+            {balance.toLocaleString()}원
+          </p>
+        </div>
+      </div>
+
+      {/* 거래 내역 리스트 */}
       <div className="mt-8 space-y-4 max-w-lg mx-auto">
         {transactions.map((transaction) => (
           <div key={transaction.id}>
             {editingId === transaction.id ? (
-              <div>
-                <input
-                  type="number"
-                  value={editFormData.amount}
-                  onChange={(e) =>
-                    setEditFormData({
-                      ...editFormData,
-                      amount: e.target.value,
-                    })
-                  }
-                  placeholder="금액"
-                />
-                <input
-                  type="date"
-                  value={editFormData.date}
-                  onChange={(e) =>
-                    setEditFormData({ ...editFormData, date: e.target.value })
-                  }
-                />
-                <input
-                  type="text"
-                  value={editFormData.category}
-                  onChange={(e) =>
-                    setEditFormData({
-                      ...editFormData,
-                      category: e.target.value,
-                    })
-                  }
-                  placeholder="카테고리"
-                />
-                <select
-                  value={editFormData.type}
-                  onChange={(e) =>
-                    setEditFormData({
-                      ...editFormData,
-                      type: e.target.value as "income" | "expense",
-                    })
-                  }
-                >
-                  <option value="income">수익</option>
-                  <option value="expense">지출</option>
-                </select>
-                <button onClick={handleUpdate}>완료</button>
-                <button onClick={handleCancel}>취소</button>
+              // 거래내역 수정 폼
+              <div className="bg-white p-4 rounded max-w-lg mx-auto shadow-md space-y-2">
+                <div className="flex flex-col gap-2 sm:flex-row">
+                  <input
+                    type="number"
+                    value={editFormData.amount}
+                    onChange={(e) =>
+                      setEditFormData({
+                        ...editFormData,
+                        amount: e.target.value,
+                      })
+                    }
+                    placeholder="금액"
+                    className="border border-[#EAC8A6] rounded px-3 py-2 w-full"
+                  />
+                  <input
+                    type="date"
+                    value={editFormData.date}
+                    onChange={(e) =>
+                      setEditFormData({ ...editFormData, date: e.target.value })
+                    }
+                    className="border border-[#EAC8A6] rounded px-3 py-2 w-full"
+                  />
+                </div>
+                <div className="flex flex-col gap-2 sm:flex-row">
+                  <input
+                    type="text"
+                    value={editFormData.category}
+                    onChange={(e) =>
+                      setEditFormData({
+                        ...editFormData,
+                        category: e.target.value,
+                      })
+                    }
+                    placeholder="카테고리"
+                    className="border border-[#EAC8A6] rounded px-3 py-2 w-full"
+                  />
+                  <select
+                    value={editFormData.type}
+                    onChange={(e) =>
+                      setEditFormData({
+                        ...editFormData,
+                        type: e.target.value as "income" | "expense",
+                      })
+                    }
+                    className="border border-[#EAC8A6] rounded px-3 py-2 w-full"
+                  >
+                    <option value="income">수익</option>
+                    <option value="expense">지출</option>
+                  </select>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={handleUpdate}
+                    className="bg-[#3D74B6] text-white px-4 py-2 rounded hover:opacity-90 transition"
+                  >
+                    수정 완료
+                  </button>
+                  <button
+                    onClick={handleCancel}
+                    className="bg-[#DC3C22] text-white px-4 py-2 rounded hover:opacity-90 transition"
+                  >
+                    취소
+                  </button>
+                </div>
               </div>
             ) : (
+              // 거래 내역 리스트
               <div
                 className={`bg-white border-l-4 rounded shadow p-4 ${
                   transaction.type === "income"
@@ -231,20 +299,20 @@ function App() {
                       {transaction.amount.toLocaleString()}원
                     </p>
                   </div>
-                </div>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => handleEdit(transaction)}
-                    className="bg-[#EAC8A6] px-3 py-1 rounded text-white"
-                  >
-                    수정
-                  </button>
-                  <button
-                    onClick={() => handleDelete(transaction.id)}
-                    className="bg-[#DC3C22] px-3 py-1 rounded text-white"
-                  >
-                    삭제
-                  </button>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handleEdit(transaction)}
+                      className="bg-[#EAC8A6] px-3 py-1 rounded text-white"
+                    >
+                      수정
+                    </button>
+                    <button
+                      onClick={() => handleDelete(transaction.id)}
+                      className="bg-[#DC3C22] px-3 py-1 rounded text-white"
+                    >
+                      삭제
+                    </button>
+                  </div>
                 </div>
               </div>
             )}
