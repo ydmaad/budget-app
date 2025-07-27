@@ -1,6 +1,8 @@
 import { useEffect, useState, type FormEvent } from "react";
 import "./App.css";
 import type { Transaction } from "./types";
+import TransactionSummary from "./components/TransactionSummary";
+import TransactionItem from "./components/TransactionItem";
 
 function App() {
   // 모든 거래내역
@@ -144,7 +146,7 @@ function App() {
         My Budget Tracker
       </h1>
 
-      {/* 거래 내열 추가 폼 */}
+      {/* 거래 내역 추가 폼 */}
       <form
         onSubmit={handleSubmit}
         className="bg-white p-4 rounded max-w-lg mx-auto shadow-md space-y-2"
@@ -199,26 +201,11 @@ function App() {
       </form>
 
       {/* 총 잔액 */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-lg mx-auto mt-6 text-center">
-        <div className="bg-[#EAF1FB] p-4 rounded shadow">
-          <p className="text-sm text-gray-500">총 수입</p>
-          <p className="text-xl font-bold text-[#3D74B6]">
-            {totalIncome.toLocaleString()}원
-          </p>
-        </div>
-        <div className="bg-[#FDEDEC] p-4 rounded shadow">
-          <p className="text-sm text-gray-500">총 지출</p>
-          <p className="text-xl font-bold text-[#DC3C22]">
-            {totalExpense.toLocaleString()}원
-          </p>
-        </div>
-        <div className="bg-[#F7F7F7] p-4 rounded shadow">
-          <p className="text-sm text-gray-500">잔액</p>
-          <p className="text-xl font-bold text-[#3D74B6]">
-            {balance.toLocaleString()}원
-          </p>
-        </div>
-      </div>
+      <TransactionSummary
+        totalExpense={totalExpense}
+        totalIncome={totalIncome}
+        balance={balance}
+      />
 
       {/* 거래 내역 리스트 */}
       <div className="mt-8 space-y-4 max-w-lg mx-auto">
@@ -302,45 +289,11 @@ function App() {
                 </div>
               ) : (
                 // 거래 내역 리스트
-                <div
-                  className={`bg-white border-l-4 rounded shadow p-4 ${
-                    transaction.type === "income"
-                      ? "border-[#3D74B6]"
-                      : "border-[#DC3C22]"
-                  }`}
-                >
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <p className="text-sm text-gray-500">
-                        {transaction.date}
-                      </p>
-                      <p className="font-medium">{transaction.category}</p>
-                      <p
-                        className={`text-lg font-bold ${
-                          transaction.type === "income"
-                            ? "text-[#3D74B6]"
-                            : "text-[#DC3C22]"
-                        }`}
-                      >
-                        {transaction.amount.toLocaleString()}원
-                      </p>
-                    </div>
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => handleEdit(transaction)}
-                        className="bg-[#EAC8A6] px-3 py-1 rounded text-white"
-                      >
-                        수정
-                      </button>
-                      <button
-                        onClick={() => handleDelete(transaction.id)}
-                        className="bg-[#DC3C22] px-3 py-1 rounded text-white"
-                      >
-                        삭제
-                      </button>
-                    </div>
-                  </div>
-                </div>
+                <TransactionItem
+                  transaction={transaction}
+                  onEdit={handleEdit}
+                  onDelete={handleDelete}
+                />
               )}
             </div>
           ))}
