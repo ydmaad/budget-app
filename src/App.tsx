@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import "./App.css";
 import type { Transaction } from "./types";
 
@@ -23,6 +23,21 @@ function App() {
     category: "",
     type: "expense" as "income" | "expense",
   });
+
+  // 거래 내역 추가, 수정, 삭제시 localStorage에 저장
+  useEffect(() => {
+    if (transactions.length > 0) {
+      localStorage.setItem("transactions", JSON.stringify(transactions));
+    }
+  }, [transactions]);
+
+  useEffect(() => {
+    const saved = localStorage.getItem("transactions");
+    if (saved) {
+      const data = JSON.parse(saved);
+      setTransactions(data);
+    }
+  }, []);
 
   // 새로운 거래를 거래 목록에 추가하는 함수
   const addTransaction = (newTransaction: Transaction) => {
@@ -207,117 +222,128 @@ function App() {
 
       {/* 거래 내역 리스트 */}
       <div className="mt-8 space-y-4 max-w-lg mx-auto">
-        {transactions.map((transaction) => (
-          <div key={transaction.id}>
-            {editingId === transaction.id ? (
-              // 거래내역 수정 폼
-              <div className="bg-white p-4 rounded max-w-lg mx-auto shadow-md space-y-2">
-                <div className="flex flex-col gap-2 sm:flex-row">
-                  <input
-                    type="number"
-                    value={editFormData.amount}
-                    onChange={(e) =>
-                      setEditFormData({
-                        ...editFormData,
-                        amount: e.target.value,
-                      })
-                    }
-                    placeholder="금액"
-                    className="border border-[#EAC8A6] rounded px-3 py-2 w-full"
-                  />
-                  <input
-                    type="date"
-                    value={editFormData.date}
-                    onChange={(e) =>
-                      setEditFormData({ ...editFormData, date: e.target.value })
-                    }
-                    className="border border-[#EAC8A6] rounded px-3 py-2 w-full"
-                  />
-                </div>
-                <div className="flex flex-col gap-2 sm:flex-row">
-                  <input
-                    type="text"
-                    value={editFormData.category}
-                    onChange={(e) =>
-                      setEditFormData({
-                        ...editFormData,
-                        category: e.target.value,
-                      })
-                    }
-                    placeholder="카테고리"
-                    className="border border-[#EAC8A6] rounded px-3 py-2 w-full"
-                  />
-                  <select
-                    value={editFormData.type}
-                    onChange={(e) =>
-                      setEditFormData({
-                        ...editFormData,
-                        type: e.target.value as "income" | "expense",
-                      })
-                    }
-                    className="border border-[#EAC8A6] rounded px-3 py-2 w-full"
-                  >
-                    <option value="income">수익</option>
-                    <option value="expense">지출</option>
-                  </select>
-                </div>
-                <div className="flex gap-2">
-                  <button
-                    onClick={handleUpdate}
-                    className="bg-[#3D74B6] text-white px-4 py-2 rounded hover:opacity-90 transition"
-                  >
-                    수정 완료
-                  </button>
-                  <button
-                    onClick={handleCancel}
-                    className="bg-[#DC3C22] text-white px-4 py-2 rounded hover:opacity-90 transition"
-                  >
-                    취소
-                  </button>
-                </div>
-              </div>
-            ) : (
-              // 거래 내역 리스트
-              <div
-                className={`bg-white border-l-4 rounded shadow p-4 ${
-                  transaction.type === "income"
-                    ? "border-[#3D74B6]"
-                    : "border-[#DC3C22]"
-                }`}
-              >
-                <div className="flex justify-between items-center">
-                  <div>
-                    <p className="text-sm text-gray-500">{transaction.date}</p>
-                    <p className="font-medium">{transaction.category}</p>
-                    <p
-                      className={`text-lg font-bold ${
-                        transaction.type === "income"
-                          ? "text-[#3D74B6]"
-                          : "text-[#DC3C22]"
-                      }`}
+        {transactions
+          .sort((a, b) => {
+            if (new Date(a.date) > new Date(b.date)) return -1;
+            if (new Date(a.date) < new Date(b.date)) return 1;
+            return 0;
+          })
+          .map((transaction) => (
+            <div key={transaction.id}>
+              {editingId === transaction.id ? (
+                // 거래내역 수정 폼
+                <div className="bg-white p-4 rounded max-w-lg mx-auto shadow-md space-y-2">
+                  <div className="flex flex-col gap-2 sm:flex-row">
+                    <input
+                      type="number"
+                      value={editFormData.amount}
+                      onChange={(e) =>
+                        setEditFormData({
+                          ...editFormData,
+                          amount: e.target.value,
+                        })
+                      }
+                      placeholder="금액"
+                      className="border border-[#EAC8A6] rounded px-3 py-2 w-full"
+                    />
+                    <input
+                      type="date"
+                      value={editFormData.date}
+                      onChange={(e) =>
+                        setEditFormData({
+                          ...editFormData,
+                          date: e.target.value,
+                        })
+                      }
+                      className="border border-[#EAC8A6] rounded px-3 py-2 w-full"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-2 sm:flex-row">
+                    <input
+                      type="text"
+                      value={editFormData.category}
+                      onChange={(e) =>
+                        setEditFormData({
+                          ...editFormData,
+                          category: e.target.value,
+                        })
+                      }
+                      placeholder="카테고리"
+                      className="border border-[#EAC8A6] rounded px-3 py-2 w-full"
+                    />
+                    <select
+                      value={editFormData.type}
+                      onChange={(e) =>
+                        setEditFormData({
+                          ...editFormData,
+                          type: e.target.value as "income" | "expense",
+                        })
+                      }
+                      className="border border-[#EAC8A6] rounded px-3 py-2 w-full"
                     >
-                      {transaction.amount.toLocaleString()}원
-                    </p>
+                      <option value="income">수익</option>
+                      <option value="expense">지출</option>
+                    </select>
                   </div>
                   <div className="flex gap-2">
                     <button
-                      onClick={() => handleEdit(transaction)}
-                      className="bg-[#EAC8A6] px-3 py-1 rounded text-white"
+                      onClick={handleUpdate}
+                      className="bg-[#3D74B6] text-white px-4 py-2 rounded hover:opacity-90 transition"
                     >
-                      수정
+                      수정 완료
                     </button>
                     <button
-                      onClick={() => handleDelete(transaction.id)}
-                      className="bg-[#DC3C22] px-3 py-1 rounded text-white"
+                      onClick={handleCancel}
+                      className="bg-[#DC3C22] text-white px-4 py-2 rounded hover:opacity-90 transition"
                     >
-                      삭제
+                      취소
                     </button>
                   </div>
                 </div>
-              </div>
-            )}
-          </div>
-        ))}
+              ) : (
+                // 거래 내역 리스트
+                <div
+                  className={`bg-white border-l-4 rounded shadow p-4 ${
+                    transaction.type === "income"
+                      ? "border-[#3D74B6]"
+                      : "border-[#DC3C22]"
+                  }`}
+                >
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <p className="text-sm text-gray-500">
+                        {transaction.date}
+                      </p>
+                      <p className="font-medium">{transaction.category}</p>
+                      <p
+                        className={`text-lg font-bold ${
+                          transaction.type === "income"
+                            ? "text-[#3D74B6]"
+                            : "text-[#DC3C22]"
+                        }`}
+                      >
+                        {transaction.amount.toLocaleString()}원
+                      </p>
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleEdit(transaction)}
+                        className="bg-[#EAC8A6] px-3 py-1 rounded text-white"
+                      >
+                        수정
+                      </button>
+                      <button
+                        onClick={() => handleDelete(transaction.id)}
+                        className="bg-[#DC3C22] px-3 py-1 rounded text-white"
+                      >
+                        삭제
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          ))}
       </div>
     </div>
   );
