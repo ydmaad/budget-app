@@ -75,7 +75,7 @@ function App() {
     .filter((transaction) => transaction.type === "expense")
     .reduce((total, transaction) => total + transaction.amount, 0);
 
-  //
+  // 잔액
   const balance = totalIncome - totalExpense;
 
   return (
