@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import "./App.css";
 import type { Transaction } from "./types";
 import TransactionSummary from "./components/TransactionSummary";
@@ -29,41 +29,48 @@ function App() {
   }, []);
 
   // 새로운 거래를 거래 목록에 추가하는 함수
-  const addTransaction = (newTransaction: Transaction) => {
-    setTransactions([...transactions, newTransaction]);
-  };
-  // console.log(transactions);
+  const addTransaction = useCallback(
+    (newTransaction: Transaction) => {
+      setTransactions([...transactions, newTransaction]);
+    },
+    [transactions]
+  );
 
   // 거래 삭제 함수
-  const handleDelete = (id: string) => {
-    setTransactions(transactions.filter((item) => item.id !== id));
-  };
+  const handleDelete = useCallback(
+    (id: string) => {
+      setTransactions(transactions.filter((item) => item.id !== id));
+    },
+    [transactions]
+  );
 
   // 거래 수정 모드로 전환하는 함수
-  const handleEdit = (transaction: Transaction) => {
+  const handleEdit = useCallback((transaction: Transaction) => {
     setIsEditing(true);
     setEditingId(transaction.id);
-  };
+  }, []);
 
   // 수정 완료 함수
-  const handleUpdate = (updatedTransaction: Transaction) => {
-    const updateTransaction = transactions.map((transaction) => {
-      if (transaction.id === editingId) {
-        return updatedTransaction;
-      }
-      return transaction;
-    });
-
-    setTransactions(updateTransaction);
-    setIsEditing(false);
-    setEditingId(null);
-  };
+  const handleUpdate = useCallback(
+    (updatedTransaction: Transaction) => {
+      const updateTransaction = transactions.map((transaction) => {
+        if (transaction.id === editingId) {
+          return updatedTransaction;
+        }
+        return transaction;
+      });
+      setTransactions(updateTransaction);
+      setIsEditing(false);
+      setEditingId(null);
+    },
+    [transactions, editingId]
+  );
 
   // 수정 취소 함수
-  const handleCancel = () => {
+  const handleCancel = useCallback(() => {
     setIsEditing(false);
     setEditingId(null);
-  };
+  }, []);
 
   // 총 수입
   const totalIncome = transactions
