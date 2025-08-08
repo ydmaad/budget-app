@@ -1,70 +1,39 @@
-# React + TypeScript + Vite
+# 💰 My Budget Tracker
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React + TypeScript로 만든 개인 예산 관리 앱입니다.  
+수입과 지출을 입력하고, 잔액을 실시간으로 확인할 수 있습니다.
 
-Currently, two official plugins are available:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🚀 주요 기능
 
-## Expanding the ESLint configuration
+- 수입/지출 항목 추가
+- 거래 수정 및 삭제
+- 항목별 합계 (총 수입 / 총 지출 / 잔액)
+- **로컬 스토리지**에 자동 저장 (새로고침해도 데이터 유지)
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## 🛠️ 사용 기술
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+- **React**
+- **TypeScript**
+- **Tailwind CSS**
+- **Vite**
+- **LocalStorage**
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
-# budget-app
+## 📦 프로젝트 구조
+src
+ ┣ assets
+ ┃ ┗ react.svg
+ ┣ components
+ ┃ ┣ EditTransactionForm.tsx
+ ┃ ┣ TransactionForm.tsx
+ ┃ ┣ TransactionItem.tsx
+ ┃ ┣ TransactionList.tsx
+ ┃ ┗ TransactionSummary.tsx
+ ┣ App.css
+ ┣ App.tsx
+ ┣ index.css
+ ┣ main.tsx
+ ┣ types.ts
+ ┗ vite-env.d.ts
